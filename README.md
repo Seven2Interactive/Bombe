@@ -11,6 +11,7 @@ https://github.com/markknol/flambe-guide/wiki
 Just look for the explanations to the classes we have here to get a good idea of how they work. Most notably:
 
 Signals: https://github.com/markknol/flambe-guide/wiki/Signal-Event-System
+
 Values and Scripts: https://github.com/markknol/flambe-guide/wiki/Working-with-values
 
 
