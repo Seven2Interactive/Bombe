@@ -41,7 +41,7 @@ namespace Bombe
 
 			_updateDelegate(Color.Lerp(_from, _to, _tween.Update(dt)));
 
-			if (_tween.isComplete())
+			if (_tween.IsComplete())
 			{
 				var overtime = _tween.elapsed - _seconds;
 				_tween = null;

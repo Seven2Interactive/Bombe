@@ -64,7 +64,7 @@ namespace Bombe
 			}
 
 
-			if (_tween.isComplete())
+			if (_tween.IsComplete())
 			{
 				var overtime = _tween.elapsed - _seconds;
 				_tween = null;
