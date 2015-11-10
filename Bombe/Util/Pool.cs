@@ -18,13 +18,10 @@ namespace Bombe {
 	/// .... Do stuff, then put it back into the pool.
 	/// objectPool.Put(obj);
 	/// 
-	/// Optionally add a Deallocator to reset your object to it's starting state, so it's ready to
-	/// go when you call Pool.Take(). Deallocator is also called if you call Pool.Dispose() ...
+	/// Optionally add a Deallocator to do garbage collection cleanup when you call Pool.Dispose();
 	/// 
 	/// objectPool.SetDeallocator((oldObj) => {
-	/// 	oldObj.x = 0;
-	/// 	oldObj.y = 0;
-	/// 	oldObj.z = 0; // Whatever other cleanup you need to do.
+	/// 	oldObject.Dispose(); // Whatever other cleanup you need to do.
 	/// });
 	/// 
 	/// </summary>
@@ -32,11 +29,18 @@ namespace Bombe {
 	{
 		/// The allocator to use to generate new objects.
 		private Func<A> _allocator;
+
 		/// The Stack of objects ready to be used.
 		private Stack<A> _freeObjects;
-		private int _capacity = 2147483647;
 
+		/// Used to cleanup objects in your pool on Pool.Dispose()
 		public Action<A> deallocator;
+
+		/// The resetter delegate.
+		public Action<A> resetter;
+
+		/// The maximum capacity of the pool.
+		private int _capacity = 2147483647;
 
 		/* ---------------------------------------------------------------------------------------- */
 		      
@@ -52,7 +56,20 @@ namespace Bombe {
 			deallocator = dealloc;
 			return this;
 		}
-		
+
+		/* ---------------------------------------------------------------------------------------- */
+
+		/// <summary>
+		/// Allows you to specify a function to be called on your object when take a re-used object from
+		/// the pool to reset it's state to initial values.
+		/// </summary>
+		/// <returns>The instance of the pool, for chaining</returns>
+		/// <param name="reset">The resetter delegate</param>
+		public Pool<A> SetResetter(Action<A> reset) {
+			resetter = reset;
+			return this;
+		}
+
 		/* ---------------------------------------------------------------------------------------- */
 
 		/// <summary>
@@ -82,7 +99,11 @@ namespace Bombe {
 		public A Take ()
 		{
 			if (_freeObjects.Count > 0) {
-				return _freeObjects.Pop();
+				A reclaimedObj = _freeObjects.Pop();
+				if (resetter != null) {
+					resetter(reclaimedObj);
+				}
+				return reclaimedObj;
 			}
 			A item = _allocator();
 #if DEBUG
