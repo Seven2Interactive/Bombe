@@ -3,7 +3,6 @@
 // https://github.com/aduros/flambe/blob/master/LICENSE.txt
 using UnityEngine;
 
-
 namespace Bombe
 {
     /// <summary>
